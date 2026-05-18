@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>TikTok Escape Race</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- ══ GAME CANVAS ══════════════════════════════════════════ -->
+  <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+  <!-- ══ GIFT FEED (bottom-right overlay) ══════════════════════ -->
+  <div id="giftFeed">
+    <div id="feedTitle">🎁 Live Gift Feed</div>
+    <div id="feedItems"></div>
+    <div id="feedHint">Send gifts to boost your team!</div>
+  </div>
+
+  <!-- ══ BOOST POP-UPS ═════════════════════════════════════════ -->
+  <div id="boostNotifications"></div>
+
+  <!-- ══ WINNER SCREEN ═════════════════════════════════════════ -->
+  <div id="winnerOverlay" class="hidden">
+    <div id="confettiCanvas"></div>
+    <div id="winnerContent">
+      <div id="winnerBadge">🏆 WINNER!</div>
+      <div id="winnerLogoWrap">
+        <img id="winnerLogo" src="" alt="" onerror="this.style.display='none'">
+      </div>
+      <div id="winnerTeamName"></div>
+      <div id="winnerPlayerName"></div>
+      <div id="winnerNextRace">Next race starting…</div>
+    </div>
+  </div>
+
+  <!-- ══ COUNTDOWN ═════════════════════════════════════════════ -->
+  <div id="countdownOverlay" class="hidden">
+    <div id="countdownLabel">Get Ready!</div>
+    <div id="countdownNumber">5</div>
+  </div>
+
+  <!-- ══ DEV PANEL (shown when URL has ?dev=1) ═════════════════ -->
+  <div id="devPanel" class="hidden">
+    <div id="devHeader">🔧 DEV MODE — Simulate Gifts</div>
+    <div id="devTeams"></div>
+    <div id="devLegend">
+      <span class="dev-badge small">S</span>small
+      <span class="dev-badge medium">M</span>medium
+      <span class="dev-badge big">B</span>big
+      <span class="dev-badge mega">★</span>mega
+      <span class="dev-badge ultra">☆</span>ultra
+    </div>
+  </div>
+
+  <!-- ══ SCRIPTS ═══════════════════════════════════════════════ -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/sounds.js"></script>
+  <script src="/js/feed.js"></script>
+  <script src="/js/renderer.js"></script>
+  <script src="/js/game.js"></script>
+</body>
+</html>
