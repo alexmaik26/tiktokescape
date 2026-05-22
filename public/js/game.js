@@ -375,8 +375,9 @@ function _buildDevPanel() {
 
     for (const tier of tiers) {
       const btn     = document.createElement('button');
-      btn.className = `db ${tier}`;
-      btn.textContent = tier[0].toUpperCase();
+      btn.className = `db ${tier.toLowerCase()}`;
+      const TIER_ICONS = { Mini: '⚡', Medium: '🔥', Mega: '💥' };
+      btn.textContent = TIER_ICONS[tier] || tier[0];
       btn.title     = `${team.name} — ${tier}`;
       btn.addEventListener('click', () => {
         if (socket) socket.emit('simulate-gift', { teamId: team.id, tier });

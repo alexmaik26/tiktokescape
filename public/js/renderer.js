@@ -14,8 +14,8 @@ const Renderer = (() => {
   // ── Constants ─────────────────────────────────────────────
   const W          = 1080;
   const H          = 1920;
-  const RACE_TOP   = 220;
-  const RACE_BOT   = 1610;
+  const RACE_TOP   = 235;
+  const RACE_BOT   = 1900;
   const RACE_H     = RACE_BOT - RACE_TOP;   // 1390
   const LABEL_W    = 150;
   const FINISH_X   = 1056;

@@ -11,13 +11,18 @@
   <!-- ══ GAME CANVAS (full 1080×1920, z=0) ══════════════════ -->
   <canvas id="gameCanvas" width="1080" height="1920"></canvas>
 
-  <!-- ══ HEADER (top 90px) ══════════════════════════════════ -->
+  <!-- ══ HEADER (0–90px) ════════════════════════════════════ -->
   <header id="header">
     <div id="headerTitle">🏟 TikTok Escape Race</div>
     <div id="headerStatus">Race in progress</div>
   </header>
 
-  <!-- ══ GIFT MAP PANEL (below header, 130px) ════════════════ -->
+  <!-- ══ LEADERBOARD STRIP (90–125px) ══════════════════════ -->
+  <div id="leaderboardStrip">
+    <!-- entries populated by leaderboard.js -->
+  </div>
+
+  <!-- ══ GIFT BOOSTS PANEL (125–235px) ════════════════════ -->
   <div id="giftMapPanel">
     <div id="gmpHeader">
       <span id="gmpTitle">🎁 Gift Boosts</span>
@@ -26,26 +31,6 @@
     <div id="gmpContent">
       <!-- populated by JS -->
     </div>
-  </div>
-
-  <!-- ══ BOTTOM PANEL (bottom 310px) ════════════════════════ -->
-  <div id="bottomPanel">
-
-    <div id="leaderboardSection">
-      <div class="bp-header">🏆 Leaderboard · Last 100 Wins</div>
-      <div id="leaderboardList">
-        <!-- rows populated by leaderboard.js -->
-      </div>
-    </div>
-
-    <div id="feedSection">
-      <div class="bp-header">🎁 Live Gift Feed</div>
-      <div id="feedItems">
-        <!-- items populated by feed.js -->
-      </div>
-      <div id="feedHint">Send gifts to boost your team!</div>
-    </div>
-
   </div>
 
   <!-- ══ BOOST POP-UPS (mid-screen) ═════════════════════════ -->
@@ -78,11 +63,9 @@
     <div id="devSubtitle">Simulate gift events</div>
     <div id="devTeams"></div>
     <div id="devLegend">
-      <span class="db small">S</span>small
-      <span class="db medium">M</span>medium
-      <span class="db big">B</span>big
-      <span class="db mega">★</span>mega
-      <span class="db ultra">☆</span>ultra
+      <span class="db mini">⚡</span> Mini
+      <span class="db medium">🔥</span> Medium
+      <span class="db mega">💥</span> Mega
     </div>
   </div>
 

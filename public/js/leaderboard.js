@@ -1,6 +1,7 @@
 // ============================================================
-//  TIKTOK ESCAPE RACE v2 — Session Leaderboard
-//  Session-based: resets when server restarts (new live).
+//  TIKTOK ESCAPE RACE v2 — Leaderboard Strip
+//  Renders a thin horizontal bar above the gift boosts panel.
+//  Shows all teams sorted by wins (most wins first).
 // ============================================================
 
 const LeaderboardManager = (() => {
@@ -9,14 +10,14 @@ const LeaderboardManager = (() => {
 
   function init(teams) {
     teamsRef = teams;
+    // Render initial zero state
+    render(teams.map(t => ({ team: t, wins: 0 })));
   }
 
-  // Called when server emits 'leaderboard-update'
   function update(data) {
     const { wins } = data;
     if (!wins) return;
 
-    // Build sorted list: most wins first
     const sorted = teamsRef
       .map(t => ({ team: t, wins: wins[t.id] || 0 }))
       .sort((a, b) => b.wins - a.wins);
@@ -25,34 +26,37 @@ const LeaderboardManager = (() => {
   }
 
   function render(sorted) {
-    const list = document.getElementById('leaderboardList');
-    if (!list) return;
-    list.innerHTML = '';
+    const strip = document.getElementById('leaderboardStrip');
+    if (!strip) return;
+    strip.innerHTML = '';
 
-    sorted.forEach(({ team, wins }, idx) => {
-      const rank = idx + 1;
-      const row  = document.createElement('div');
-      row.className = 'lb-row';
+    for (const { team, wins } of sorted) {
+      const entry = document.createElement('div');
+      entry.className = 'ls-entry';
 
-      const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
-      const color     = wins > 0 ? (team.accentColor || '#fff') : 'rgba(255,255,255,.35)';
+      const logo = document.createElement('img');
+      logo.className = 'ls-logo';
+      logo.src = team.logo;
+      logo.alt = '';
+      logo.onerror = () => { logo.style.opacity = '.25'; };
 
-      row.innerHTML = `
-        <span class="lb-rank ${rankClass}">#${rank}</span>
-        <img class="lb-logo" src="${team.logo}" alt=""
-             onerror="this.style.opacity='.3'">
-        <span class="lb-name" style="color:${color}">${_esc(team.name)}</span>
-        <span class="lb-wins" style="color:${wins > 0 ? '#FFD700' : 'rgba(255,255,255,.25)'}">${wins}</span>
-      `;
+      const name = document.createElement('span');
+      name.className = 'ls-name';
+      name.style.color = wins > 0
+        ? (team.accentColor || '#fff')
+        : 'rgba(255,255,255,.3)';
+      name.textContent = team.shortName || team.name;
 
-      list.appendChild(row);
-    });
-  }
+      const winsEl = document.createElement('span');
+      winsEl.className = 'ls-wins';
+      winsEl.textContent = wins > 0 ? wins : '–';
+      if (wins > 0) winsEl.style.color = '#FFD700';
 
-  function _esc(s) {
-    const d = document.createElement('div');
-    d.textContent = String(s);
-    return d.innerHTML;
+      entry.appendChild(logo);
+      entry.appendChild(name);
+      entry.appendChild(winsEl);
+      strip.appendChild(entry);
+    }
   }
 
   return { init, update };
