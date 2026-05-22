@@ -1,7 +1,7 @@
 {
   "name": "tiktokescape",
-  "version": "1.0.0",
-  "description": "TikTok Live Interactive Race Game for OBS Browser Source",
+  "version": "2.0.0",
+  "description": "TikTok Live Football Race Game – Portrait 9:16 for OBS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

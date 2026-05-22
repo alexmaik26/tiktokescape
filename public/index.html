@@ -2,28 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=1920">
+  <meta name="viewport" content="width=1080">
   <title>TikTok Escape Race</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-  <!-- ══ GAME CANVAS ══════════════════════════════════════════ -->
-  <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+  <!-- ══ GAME CANVAS (full 1080×1920, z=0) ══════════════════ -->
+  <canvas id="gameCanvas" width="1080" height="1920"></canvas>
 
-  <!-- ══ GIFT FEED (bottom-right overlay) ══════════════════════ -->
-  <div id="giftFeed">
-    <div id="feedTitle">🎁 Live Gift Feed</div>
-    <div id="feedItems"></div>
-    <div id="feedHint">Send gifts to boost your team!</div>
+  <!-- ══ HEADER (top 90px) ══════════════════════════════════ -->
+  <header id="header">
+    <div id="headerTitle">🏟 TikTok Escape Race</div>
+    <div id="headerStatus">Race in progress</div>
+  </header>
+
+  <!-- ══ GIFT MAP PANEL (below header, 130px) ════════════════ -->
+  <div id="giftMapPanel">
+    <div id="gmpHeader">
+      <span id="gmpTitle">🎁 Gift Boosts</span>
+      <span id="gmpPager"></span>
+    </div>
+    <div id="gmpContent">
+      <!-- populated by JS -->
+    </div>
   </div>
 
-  <!-- ══ BOOST POP-UPS ═════════════════════════════════════════ -->
-  <div id="boostNotifications"></div>
+  <!-- ══ BOTTOM PANEL (bottom 310px) ════════════════════════ -->
+  <div id="bottomPanel">
 
-  <!-- ══ WINNER SCREEN ═════════════════════════════════════════ -->
+    <div id="leaderboardSection">
+      <div class="bp-header">🏆 Leaderboard · Last 100 Wins</div>
+      <div id="leaderboardList">
+        <!-- rows populated by leaderboard.js -->
+      </div>
+    </div>
+
+    <div id="feedSection">
+      <div class="bp-header">🎁 Live Gift Feed</div>
+      <div id="feedItems">
+        <!-- items populated by feed.js -->
+      </div>
+      <div id="feedHint">Send gifts to boost your team!</div>
+    </div>
+
+  </div>
+
+  <!-- ══ BOOST POP-UPS (mid-screen) ═════════════════════════ -->
+  <div id="boostNotifs"></div>
+
+  <!-- ══ WINNER OVERLAY ══════════════════════════════════════ -->
   <div id="winnerOverlay" class="hidden">
-    <div id="confettiCanvas"></div>
+    <canvas id="confettiCanvas" width="1080" height="1920"></canvas>
     <div id="winnerContent">
       <div id="winnerBadge">🏆 WINNER!</div>
       <div id="winnerLogoWrap">
@@ -35,30 +65,35 @@
     </div>
   </div>
 
-  <!-- ══ COUNTDOWN ═════════════════════════════════════════════ -->
+  <!-- ══ COUNTDOWN OVERLAY ═══════════════════════════════════ -->
   <div id="countdownOverlay" class="hidden">
-    <div id="countdownLabel">Get Ready!</div>
-    <div id="countdownNumber">5</div>
+    <div id="cdLabel">Get Ready!</div>
+    <div id="cdNumber">5</div>
+    <div id="cdSub">Send gifts to boost your team</div>
   </div>
 
-  <!-- ══ DEV PANEL (shown when URL has ?dev=1) ═════════════════ -->
+  <!-- ══ DEV PANEL (visible when URL has ?dev=1) ════════════ -->
   <div id="devPanel" class="hidden">
-    <div id="devHeader">🔧 DEV MODE — Simulate Gifts</div>
+    <div id="devHeader">🔧 DEV MODE</div>
+    <div id="devSubtitle">Simulate gift events</div>
     <div id="devTeams"></div>
     <div id="devLegend">
-      <span class="dev-badge small">S</span>small
-      <span class="dev-badge medium">M</span>medium
-      <span class="dev-badge big">B</span>big
-      <span class="dev-badge mega">★</span>mega
-      <span class="dev-badge ultra">☆</span>ultra
+      <span class="db small">S</span>small
+      <span class="db medium">M</span>medium
+      <span class="db big">B</span>big
+      <span class="db mega">★</span>mega
+      <span class="db ultra">☆</span>ultra
     </div>
   </div>
 
-  <!-- ══ SCRIPTS ═══════════════════════════════════════════════ -->
+  <!-- ══ SCRIPTS ══════════════════════════════════════════════ -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/sounds.js"></script>
-  <script src="/js/feed.js"></script>
+  <script src="/js/animator.js"></script>
   <script src="/js/renderer.js"></script>
+  <script src="/js/feed.js"></script>
+  <script src="/js/leaderboard.js"></script>
   <script src="/js/game.js"></script>
+
 </body>
 </html>

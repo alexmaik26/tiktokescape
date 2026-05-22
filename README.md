@@ -1,6 +1,9 @@
-# 🏟 TikTok Escape Race
+# 🏟 TikTok Escape Race — v2 (Portrait 9:16)
 
-Interactive race game for TikTok Live. Viewers send gifts → teams get boosted → first team to finish wins!
+Interactive football race game for TikTok Live.  
+Viewers send TikTok gifts → teams get boosted → first team to the finish line wins!
+
+**Layout:** Portrait 1080×1920 · Designed for OBS Browser Source on a vertical canvas.
 
 ---
 
@@ -8,24 +11,28 @@ Interactive race game for TikTok Live. Viewers send gifts → teams get boosted 
 
 ```
 tiktokescape/
-├── server.js                   ← Backend (Node.js + Socket.IO + TikTok)
+├── server.js                      ← Backend: Express + Socket.IO + TikTok
 ├── package.json
 ├── config/
-│   ├── game-config.js          ← ⭐ Main settings (username, speed, timing)
-│   ├── teams.js                ← ⭐ Team names, colors, players, logos
-│   └── gifts.js                ← ⭐ Which TikTok gift boosts which team
+│   ├── game-config.js             ← ⭐ Main settings (username, speed, timing)
+│   ├── teams.js                   ← ⭐ All 11 teams + player + animation config
+│   └── gifts.js                   ← ⭐ Which TikTok gift boosts which team
 └── public/
-    ├── index.html              ← Game page (open in OBS Browser Source)
+    ├── index.html
     ├── css/style.css
     ├── js/
-    │   ├── game.js             ← Game logic & state machine
-    │   ├── renderer.js         ← Canvas drawing
-    │   ├── feed.js             ← Live gift feed overlay
-    │   └── sounds.js           ← Audio manager
+    │   ├── game.js                ← Game state machine & orchestrator
+    │   ├── renderer.js            ← Canvas drawing (portrait layout)
+    │   ├── animator.js            ← Player image/sprite animation system
+    │   ├── feed.js                ← Live gift feed overlay
+    │   ├── leaderboard.js         ← Session leaderboard display
+    │   └── sounds.js              ← Audio manager
     └── assets/
-        ├── logos/              ← Put team logo PNG files here
-        ├── players/            ← Put player image PNG files here
-        └── sounds/             ← Put MP3 audio files here
+        ├── logos/                 ← Team logo PNG files
+        ├── players/               ← Player image PNG files
+        ├── sprites/               ← Sprite sheet PNG files
+        ├── balls/                 ← Ball image PNG files
+        └── sounds/                ← MP3 audio files
 ```
 
 ---
@@ -33,137 +40,199 @@ tiktokescape/
 ## 🖥️ Installation on Windows
 
 ### Step 1 — Install Node.js
-1. Go to https://nodejs.org
-2. Download the **LTS** version
-3. Run the installer (keep all defaults, make sure "Add to PATH" is checked)
-4. Open **Command Prompt** and verify: `node --version` → should show v18 or v20
+1. Go to **https://nodejs.org** → download the **LTS** version
+2. Run the installer (keep all defaults, ensure "Add to PATH" is checked)
+3. Open **Command Prompt** and verify: `node --version`
 
-### Step 2 — Get the project
-Copy the `tiktokescape` folder anywhere you like, e.g.:
+### Step 2 — Copy the project
+Place the `tiktokescape` folder anywhere, e.g.:
 ```
 C:\Users\YourName\tiktokescape\
 ```
 
 ### Step 3 — Install dependencies
-Open **Command Prompt**, navigate to the folder, and run:
 ```cmd
 cd C:\Users\YourName\tiktokescape
 npm install
 ```
-Wait until it finishes (downloads express, socket.io, tiktok-live-connector).
 
-### Step 4 — Start the server
+### Step 4 — Set your TikTok username
+Open `config/game-config.js` and change:
+```js
+tiktokUsername: 'YOUR_TIKTOK_USERNAME',
+```
+Replace with your TikTok handle **without the @**.
+
+### Step 5 — Start the server
 ```cmd
 npm start
 ```
 You should see:
 ```
 ╔════════════════════════════════════════════╗
-║          TIKTOK ESCAPE RACE SERVER         ║
+║       TIKTOK ESCAPE RACE v2 · SERVER       ║
 ╠════════════════════════════════════════════╣
 ║  Game:     http://localhost:3000           ║
 ║  Dev Mode: http://localhost:3000?dev=1     ║
 ╚════════════════════════════════════════════╝
 ```
 
-### Step 5 — Open in browser
-Go to: **http://localhost:3000**
-The race should start automatically.
-
-To stop the server: press **Ctrl + C** in Command Prompt.
+Open **http://localhost:3000** in a browser to verify it works.
 
 ---
 
-## 🎮 OBS Browser Source Setup
+## 📺 OBS Browser Source Setup (Portrait 9:16)
 
-1. Open OBS Studio
-2. In **Sources**, click **+** → **Browser**
-3. Name it "TikTok Race Game"
-4. Settings:
+1. Open **OBS Studio**
+2. In Sources, click **+** → **Browser**
+3. Name it: `TikTok Race Game`
+4. Configure:
    - **URL**: `http://localhost:3000`
-   - **Width**: `1920`
-   - **Height**: `1080`
-   - ✅ **Custom CSS**: leave empty (or add `body { background: transparent; }` for transparency)
-   - ✅ **Shutdown source when not visible**: OFF
-   - ✅ **Refresh browser when scene becomes active**: ON
-5. Click OK
-6. Resize/position the source to fill your canvas
+   - **Width**: `1080`
+   - **Height**: `1920`
+   - **Custom CSS**: *(leave empty)*
+   - **Shutdown source when not visible**: OFF
+   - **Refresh browser when scene becomes active**: ON
+5. Click **OK**
 
-> **Important**: The server (`npm start`) must be running before OBS loads the browser source.
+> **Important**: The server (`npm start`) must be running **before** OBS loads the source.  
+> If the screen is blank, right-click the source → **Refresh**.
 
----
-
-## 🔧 Setting Your TikTok Username
-
-Open `config/game-config.js` and change:
-```js
-tiktokUsername: 'YOUR_TIKTOK_USERNAME',
-```
-Replace `YOUR_TIKTOK_USERNAME` with your TikTok handle **without the @**.
-
-Example:
-```js
-tiktokUsername: 'myTikTokName',
-```
-
-Then restart the server (`Ctrl+C`, then `npm start`).
+### OBS Scene for Vertical TikTok Streams
+- Set your OBS canvas to **1080×1920** *(Settings → Video → Base Resolution)*
+- Or, in a normal 16:9 scene, place the 1080×1920 Browser Source and crop/resize it to fit your layout
 
 ---
 
-## 🖼️ Adding Logos & Player Images
+## 🖼️ Adding Logos, Player Images & Sprites
+
+### Where to put files
+
+| Asset | Folder | Used for |
+|---|---|---|
+| Team logos | `public/assets/logos/` | Lane labels, leaderboard, winner screen |
+| Player images | `public/assets/players/` | Character in each lane |
+| Sprite sheets | `public/assets/sprites/` | Animated running (optional) |
+| Ball images | `public/assets/balls/` | Ball in front of each player |
+| Sounds | `public/assets/sounds/` | Gift & winner audio |
+
+**If any file is missing, a coloured fallback is shown — the game never crashes.**
+
+---
 
 ### Required filenames
 
-**Team Logos** → `public/assets/logos/`
-| File | Team |
-|---|---|
-| `al-hilal.png` | Al-Hilal |
-| `al-nassr.png` | Al-Nassr |
-| `fenerbahce.png` | Fenerbahçe |
-| `besiktas.png` | Beşiktaş |
-| `galatasaray.png` | Galatasaray |
-| `olympiacos.png` | Olympiacos |
-| `barcelona.png` | Barcelona |
-| `real-madrid.png` | Real Madrid |
-| `psg.png` | PSG |
-| `bayern.png` | Bayern Munich |
-| `man-city.png` | Man City |
+**Logos** → `public/assets/logos/`
+```
+al-hilal.png           al-nassr.png         fenerbahce.png
+besiktas.png           galatasaray.png      olympiacos.png
+barcelona.png          real-madrid.png      panathinaikos.png
+partizan.png           red-star-belgrade.png
+```
 
-**Player Images** → `public/assets/players/`
-| File | Player |
-|---|---|
-| `al-dawsari.png` | Salem Al-Dawsari |
-| `ronaldo.png` | Cristiano Ronaldo |
-| `talisca.png` | Talisca |
-| `kokcu.png` | Orkun Kökçü |
-| `osimhen.png` | Victor Osimhen |
-| `el-kaabi.png` | Ayoub El Kaabi |
-| `yamal.png` | Lamine Yamal |
-| `mbappe.png` | Kylian Mbappé |
-| `dembele.png` | Ousmane Dembélé |
-| `kane.png` | Harry Kane |
-| `haaland.png` | Erling Haaland |
+**Player images** → `public/assets/players/`
+```
+al-hilal-player.png      al-nassr-player.png    fenerbahce-player.png
+besiktas-player.png      galatasaray-player.png olympiacos-player.png
+barcelona-player.png     real-madrid-player.png panathinaikos-player.png
+partizan-player.png      red-star-player.png
+```
 
-**Tips:**
-- PNG with transparent background looks best for logos
-- Player images: any ratio works, they're shown in a circle
-- Recommended size: 200×200 px minimum
-- If a file is missing, a coloured fallback is shown automatically — the game never crashes
+**Sprite sheets** → `public/assets/sprites/`
+*(only needed if you set `useSprite: true` for a team)*
+```
+al-hilal-run.png         al-nassr-run.png       fenerbahce-run.png
+besiktas-run.png         galatasaray-run.png    olympiacos-run.png
+barcelona-run.png        real-madrid-run.png    panathinaikos-run.png
+partizan-run.png         red-star-run.png
+```
 
-To change paths, edit `config/teams.js` (the `logo` and `player.image` fields).
+**Balls** → `public/assets/balls/`
+```
+default-ball.png       ← used by all teams unless a custom path is set
+```
 
 ---
 
-## 🔊 Adding Sound Files
+### Recommended image sizes
 
-Put MP3 files in `public/assets/sounds/`:
+| Asset | Recommended size | Notes |
+|---|---|---|
+| Logo PNG | 256×256 or 512×512 | Transparent background preferred |
+| Player PNG | 256×256 | Will be shown in a circle |
+| Sprite sheet | `frameWidth × frames` wide, `frameHeight` tall | All frames on one horizontal row |
+| Ball PNG | 64×64 or 128×128 | Transparent background |
+
+---
+
+### How to change image paths
+
+Open `config/teams.js` and update the relevant path for any team:
+```js
+logo:        '/assets/logos/my-custom-logo.png',
+playerImage: '/assets/players/my-player.png',
+```
+
+---
+
+## 🎬 Player Animation System
+
+Each team has two animation modes. Switch between them in `config/teams.js`.
+
+### Mode A — Simple Image + Bounce (default, `useSprite: false`)
+- Uses the `playerImage` PNG
+- The game applies a vertical bounce animation to simulate running
+- **No extra work needed** — just drop in a player PNG
+
+Config example:
+```js
+useSprite:      false,
+animationType:  'bounce-run',
+animationSpeed: 1.0,    // 1.0 = normal, 1.5 = faster bounce
+characterSize:  68,     // character diameter in pixels
+ballSize:       26,     // ball diameter in pixels
+ballOffset:     34,     // gap between character edge and ball centre
+```
+
+### Mode B — Sprite Sheet Animation (`useSprite: true`)
+- Uses the `playerSprite` sheet
+- All frames must be on **one horizontal row**, left to right
+- Frame 0 is leftmost
+
+Config example:
+```js
+useSprite:    true,
+playerSprite: '/assets/sprites/my-team-run.png',
+sprite: {
+  frameWidth:  96,     // pixel width of one frame
+  frameHeight: 96,     // pixel height of one frame
+  frames:      6,      // total number of frames
+  duration:    600,    // ms for one full animation cycle
+  loop:        true,
+},
+```
+
+### Making all teams use the same style
+Set the same `useSprite`, `characterSize`, `animationType`, and `animationSpeed` for all teams in `config/teams.js`.
+
+### Making each team different
+Each team entry in `config/teams.js` is independent — set any values you like per team.
+
+### Disabling sprite for a specific team
+Set `useSprite: false` on that team entry. It will fall back to `playerImage` automatically.
+
+---
+
+## 🔊 Sound Files
+
 | File | When played |
 |---|---|
-| `small-gift.mp3` | Small / medium gifts |
-| `big-gift.mp3` | Big / mega / ultra gifts |
-| `winner.mp3` | When a team wins |
+| `public/assets/sounds/small-gift.mp3` | Small & medium gifts |
+| `public/assets/sounds/big-gift.mp3` | Big gifts |
+| `public/assets/sounds/mega-boost.mp3` | Mega & ultra gifts |
+| `public/assets/sounds/winner.mp3` | When a winner is declared |
 
-Missing sound files are silently ignored — the game won't crash.
+Missing audio files are silently ignored — the game continues without sound.
 
 ---
 
@@ -172,31 +241,88 @@ Missing sound files are silently ignored — the game won't crash.
 Open `config/gifts.js` to see which TikTok gift boosts which team.
 
 ### ⚠️ Gift names are region-specific!
-TikTok gift names may differ in your country. To find the exact names:
 
-1. Set `DEBUG=1` when starting the server:
+TikTok gift names differ between countries. To find exact names:
+
+1. Start server with debug logging:
    ```cmd
    set DEBUG=1 && npm start
    ```
-2. Go LIVE on TikTok
-3. Ask a friend to send any gift
-4. The terminal will print:
+2. Go **LIVE** on TikTok
+3. Ask a viewer to send any gift
+4. The terminal prints:
    ```
    [DEBUG gift] name="Rose" id=5655 repeat=1
    ```
 5. Copy the exact name and update `config/gifts.js`
 
-### Current gift mapping overview
+### Gift mapping overview
 
-| Tier | Progress | Speed Boost | Duration |
+| Tier | Instant Progress | Speed Boost | Duration |
 |---|---|---|---|
-| small | +2 | none | — |
-| medium | +8 | 1.4× | 4 sec |
-| big | +22 | 2.0× | 6 sec |
-| mega | +55 | 2.8× | 9 sec |
-| ultra | +100 | 3.5× | 12 sec |
+| small | +5 | none | — |
+| medium | +20 | 1.35× | 4 sec |
+| big | +60 | 1.85× | 6 sec |
+| mega | +150 | 2.6× | 9 sec |
+| ultra | +400 | 3.5× | 12 sec |
 
-To change boost values, edit `config/game-config.js` → `boostTiers`.
+Change these values in `config/game-config.js` → `boostTiers`.
+
+### Per-team gift assignments (current defaults)
+
+| Team | Small | Medium | Big | Mega/Ultra |
+|---|---|---|---|---|
+| Al-Hilal | Rose | Heart Me | Confetti | Lion |
+| Al-Nassr | TikTok | Love Bang | — | Fireworks / Galaxy |
+| Fenerbahçe | Panda | Sun Cream | Butterfly | Drama Queen |
+| Beşiktaş | Italian Hand | Paper Crane | VIP Entrance | Yacht |
+| Galatasaray | Finger Heart | Wishing Bottle | Cheer Bear | Universe |
+| Olympiacos | Sunglasses | RGB Light Stick | Sports Car | Starship |
+| Barcelona | Cap | Perfume | Castle | Crown |
+| Real Madrid | Mic | Lucky Box | Fire | Superstar |
+| Panathinaikos | Hat | Doughnut | Football | Eagle |
+| Partizan | Camera | Ice Cream | Bicycle | Diamond |
+| Red Star | Guitar | Cake | Lightning | Rocket |
+
+### Adding a new gift or overriding boost values
+```js
+// config/gifts.js
+
+// Simple assignment:
+'Paw Print': { teamId: 'panathinaikos', tier: 'small' },
+
+// With custom override:
+'Dragon': {
+  teamId: 'galatasaray', tier: 'ultra',
+  custom: { instantProgress: 500, speedMultiplier: 4.0, boostDurationMs: 15000 }
+},
+```
+
+---
+
+## ⚙️ Quick Config Reference (`config/game-config.js`)
+
+| Setting | Default | Effect |
+|---|---|---|
+| `tiktokUsername` | `'YOUR_TIKTOK_USERNAME'` | Your TikTok handle |
+| `baseSpeed` | `0.5` | Progress/sec added automatically |
+| `raceTarget` | `1000` | Progress needed to win |
+| `winnerScreenDuration` | `10000` | ms winner screen shows |
+| `countdownDuration` | `5` | Seconds before race starts |
+| `leaderboardMaxWins` | `100` | Session win history size |
+| `feedMaxItems` | `6` | Max gift feed entries visible |
+| `port` | `3000` | Server port |
+
+### Tuning race duration
+
+At `baseSpeed: 0.5` and `raceTarget: 1000`:
+- With **no gifts**: race finishes in ~33 min
+- With **moderate gifts** (few per minute per team): expect **6–10 min** races
+- With **heavy gift rain**: expect 3–5 min
+
+To make races longer → lower `baseSpeed` (e.g. `0.3`)  
+To make races shorter → raise `baseSpeed` (e.g. `1.0`)  
+You can also raise `raceTarget` for finer control without touching speeds.
 
 ---
 
@@ -204,67 +330,61 @@ To change boost values, edit `config/game-config.js` → `boostTiers`.
 
 Open: **http://localhost:3000?dev=1**
 
-You'll see a panel in the top-left corner. Click any button to fire a fake gift event for any team, without needing TikTok Live.
+A panel appears in the top-right corner with buttons for each team:
+- **S** = simulate small gift
+- **M** = simulate medium gift
+- **B** = simulate big gift
+- **★** = simulate mega gift
+- **☆** = simulate ultra gift
 
-Buttons: **S** = small, **M** = medium, **B** = big, **★** = mega, **☆** = ultra
-
----
-
-## ⚙️ Quick Config Reference
-
-All in `config/game-config.js`:
-
-| Setting | Default | Description |
-|---|---|---|
-| `tiktokUsername` | `'YOUR_TIKTOK_USERNAME'` | Your TikTok handle |
-| `baseSpeed` | `0.4` | Progress per second without gifts |
-| `winnerScreenDuration` | `10000` | Winner screen time (ms) |
-| `countdownDuration` | `5` | Seconds before new race |
-| `feedMaxItems` | `8` | Max gift feed entries on screen |
-| `port` | `3000` | Server port |
+Test the full race, winner screen, and leaderboard without going live.
 
 ---
 
 ## 🔌 Troubleshooting TikTok Connection
 
-### "No username set — running in DEMO MODE only"
-→ Open `config/game-config.js`, set `tiktokUsername` to your handle, restart.
+### "No username set — DEMO MODE only"
+→ Open `config/game-config.js`, set `tiktokUsername`, restart server.
 
-### "Connection failed: …"
-Possible causes:
-- You're not currently LIVE on TikTok
-- Your stream is set to private/restricted
-- TikTok changed their API (see below)
-
-The server retries every 30 seconds automatically.
-
-### If tiktok-live-connector stops working
-TikTok occasionally changes the underlying API. Steps:
-1. Check for library updates: `npm update tiktok-live-connector`
-2. Check the library's GitHub issues: https://github.com/zerodytrash/TikTok-Live-Connector/issues
-3. As a fallback, run in Dev Mode (`?dev=1`) to keep the game running manually
+### "Connection failed" error
+- You must be **currently LIVE** on TikTok
+- Stream must be **public**
+- Server auto-retries every 30 seconds
 
 ### Gifts arrive but team doesn't boost
-→ The gift name in `config/gifts.js` doesn't match exactly.
-→ Run with `DEBUG=1` to see the raw gift name in the terminal, then update gifts.js.
+→ Gift name doesn't match `config/gifts.js`  
+→ Run with `DEBUG=1`, check terminal for exact gift name, update gifts.js
 
-### OBS shows blank/white screen
-- Make sure the server is running (`npm start`)
-- Check the URL is exactly `http://localhost:3000`
-- In OBS, right-click the Browser Source → **Refresh**
-- Try opening `http://localhost:3000` in a regular browser first
+### tiktok-live-connector stops working (TikTok API changed)
+1. Update the library: `npm update tiktok-live-connector`
+2. Check for issues: https://github.com/zerodytrash/TikTok-Live-Connector/issues
+3. Use Dev Mode (`?dev=1`) to keep the game running while the library updates
+
+### OBS shows blank or white screen
+- Confirm server is running (`npm start`)
+- URL in OBS must be exactly `http://localhost:3000`
+- Right-click source → **Refresh**
+- Try opening the URL in a normal browser first
 
 ### Port already in use
-Change `port` in `config/game-config.js` to e.g. `3001`, then update OBS URL too.
+Change `port` in `config/game-config.js` to e.g. `3001`, update OBS URL to match.
 
 ---
 
-## 🎨 Race Timing
+## 📋 What Changed vs v1
 
-With `baseSpeed: 0.4` and no gifts:
-- Race finishes in approximately **4 minutes**
-
-To make it longer: lower `baseSpeed` (e.g. `0.25` → ~7 min)
-To make it shorter: raise `baseSpeed` (e.g. `0.7` → ~2.5 min)
-
-Gifts add direct progress on top of the base movement.
+| Feature | v1 | v2 |
+|---|---|---|
+| Layout | Landscape 1920×1080 | **Portrait 1080×1920** |
+| Teams | PSG, Bayern, Man City | **Panathinaikos, Partizan, Red Star** |
+| Race duration | ~4 min | **6–10 min** (tunable) |
+| Race target | 100 | **1000** (finer control) |
+| Player system | Fixed image in circle | **Asset-driven: image OR sprite sheet** |
+| Ball animation | None | **Rotating ball in front of player** |
+| Bounce animation | None | **Vertical bounce simulate running** |
+| Leaderboard | None | **Session-based, last 100 wins** |
+| Gift map panel | None | **Rotating panel in UI** |
+| Gift config | tier only | **Per-gift custom overrides** |
+| Sounds | 2 files | **3 tiers: small / big / mega** |
+| Gift feed | Bottom-right corner | **Bottom-right panel, compact** |
+| Boost notifications | Middle of screen | **Middle of screen (same)** |

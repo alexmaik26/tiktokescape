@@ -1,57 +1,52 @@
 // ============================================================
-//  TIKTOK ESCAPE RACE — Sound Manager
-//  Audio files go in: public/assets/sounds/
-//    small-gift.mp3   — played on small/medium gifts
-//    big-gift.mp3     — played on big/mega/ultra gifts
-//    winner.mp3       — played when a winner is declared
-//  Missing files are silently ignored.
+//  TIKTOK ESCAPE RACE v2 — Sound Manager
+//
+//  Place audio files in: public/assets/sounds/
+//    small-gift.mp3   – small & medium gifts
+//    big-gift.mp3     – big gifts
+//    mega-boost.mp3   – mega & ultra gifts
+//    winner.mp3       – winner celebration
+//
+//  Missing files are silently ignored – the game never crashes.
 // ============================================================
 
 const SoundManager = (() => {
-  const sounds = {};
+  const loaded = {};
 
-  // Map tier → file key
-  const tierToKey = {
-    small:  'small',
-    medium: 'small',
-    big:    'big',
-    mega:   'big',
-    ultra:  'big',
+  const files = {
+    small:  '/assets/sounds/small-gift.mp3',
+    big:    '/assets/sounds/big-gift.mp3',
+    mega:   '/assets/sounds/mega-boost.mp3',
+    winner: '/assets/sounds/winner.mp3',
   };
 
-  async function init() {
-    const files = {
-      small:  '/assets/sounds/small-gift.mp3',
-      big:    '/assets/sounds/big-gift.mp3',
-      winner: '/assets/sounds/winner.mp3',
-    };
+  const volumes = { small: 0.45, big: 0.55, mega: 0.65, winner: 0.75 };
 
+  async function init() {
     for (const [key, src] of Object.entries(files)) {
       try {
-        const audio = new Audio(src);
-        audio.volume = key === 'winner' ? 0.75 : 0.50;
-        // Preload
-        audio.load();
-        sounds[key] = audio;
-      } catch (e) {
-        // File missing or format not supported — continue silently
-      }
+        const a = new Audio(src);
+        a.volume = volumes[key] ?? 0.5;
+        a.load();
+        loaded[key] = a;
+      } catch { /* file missing – silently skip */ }
     }
   }
 
   function play(key) {
-    const s = sounds[key];
+    const s = loaded[key];
     if (!s) return;
     try {
-      const clone = s.cloneNode();
-      clone.volume = s.volume;
-      clone.play().catch(() => {});
-    } catch (e) {}
+      const c = s.cloneNode();
+      c.volume = s.volume;
+      c.play().catch(() => {});
+    } catch { }
   }
 
-  function playForTier(tier) {
-    play(tierToKey[tier] || 'small');
+  // soundKey comes from gift config: 'small' | 'big' | 'mega'
+  function playFromGift(soundKey) {
+    play(soundKey || 'small');
   }
 
-  return { init, play, playForTier };
+  return { init, play, playFromGift };
 })();

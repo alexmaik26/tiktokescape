@@ -1,26 +1,18 @@
 // ============================================================
-//  TIKTOK ESCAPE RACE — Gift Feed Manager
-//  Manages the live gift feed overlay on the right side.
+//  TIKTOK ESCAPE RACE v2 — Live Gift Feed
 // ============================================================
 
 const FeedManager = (() => {
 
-  let teamsRef   = [];
-  let maxItems   = 8;
-  let itemTTL    = 8000;
-  let feedItems  = [];   // { id, el, timerId }
+  let teamsRef  = [];
+  let maxItems  = 6;
+  let itemTTL   = 8000;
 
-  const TIER_ICON = {
-    small:  '⚡',
-    medium: '🔥',
-    big:    '🚀',
-    mega:   '💥',
-    ultra:  '🌟',
-  };
+  const TIER_ICON = { small:'⚡', medium:'🔥', big:'🚀', mega:'💥', ultra:'🌟' };
 
   function init(teams, config) {
     teamsRef = teams;
-    maxItems = config?.feedMaxItems   ?? 8;
+    maxItems = config?.feedMaxItems   ?? 6;
     itemTTL  = config?.feedItemDuration ?? 8000;
   }
 
@@ -31,50 +23,39 @@ const FeedManager = (() => {
     const container = document.getElementById('feedItems');
     if (!container) return;
 
-    const id    = `fi-${Date.now()}-${Math.random()}`;
-    const icon  = TIER_ICON[data.giftTier] || '🎁';
     const color = team.accentColor || team.color || '#fff';
+    const icon  = TIER_ICON[data.giftTier] || '🎁';
 
     const el = document.createElement('div');
     el.className = 'feed-item';
-    el.id        = id;
     el.style.borderColor = color;
     el.innerHTML = `
-      <div class="fi-viewer">👤 ${esc(data.nickname || data.uniqueId || 'Viewer')}</div>
-      <div class="fi-gift">${icon} ${esc(data.giftName || 'Gift')}</div>
-      <div class="fi-boost" style="color:${color}">→ ${esc(team.name)} +${data.boostPoints}</div>
+      <div class="fi-viewer">👤 ${_esc(data.nickname || data.uniqueId || 'Viewer')}</div>
+      <div class="fi-gift">${icon} ${_esc(data.giftName || 'Gift')}</div>
+      <div class="fi-boost" style="color:${color}">→ ${_esc(team.name)} +${data.instantProgress}</div>
     `;
 
     // Insert at top
-    if (container.firstChild) {
-      container.insertBefore(el, container.firstChild);
-    } else {
-      container.appendChild(el);
-    }
+    container.insertBefore(el, container.firstChild);
 
-    // Remove excess items
+    // Prune oldest items
     while (container.children.length > maxItems) {
-      const last = container.lastChild;
-      if (last) removeEl(last);
+      _remove(container.lastChild);
     }
 
-    // Schedule auto-removal
-    const timerId = setTimeout(() => removeEl(el), itemTTL);
-    feedItems.push({ id, el, timerId });
+    // Auto-remove after TTL
+    setTimeout(() => _remove(el), itemTTL);
   }
 
-  function removeEl(el) {
+  function _remove(el) {
     if (!el || !el.parentNode) return;
     el.classList.add('removing');
-    setTimeout(() => {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    }, 420);
-    feedItems = feedItems.filter(fi => fi.el !== el);
+    setTimeout(() => el.parentNode?.removeChild(el), 420);
   }
 
-  function esc(str) {
+  function _esc(s) {
     const d = document.createElement('div');
-    d.textContent = String(str);
+    d.textContent = String(s);
     return d.innerHTML;
   }
 
