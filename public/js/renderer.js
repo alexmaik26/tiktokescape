@@ -22,10 +22,10 @@ const Renderer = (() => {
   const TRACK_W    = FINISH_X - LABEL_W;    // 906
 
   let canvas, ctx;
-  let teamsRef = [];
-  let raceTarget = 1000;
-
-  // Particle pool per team (added here, read from teamsRef)
+  let teamsRef     = [];
+  let raceTarget   = 1000;
+  let teamGiftsMap = {};
+  const giftImages = {};
 
   // ── Init ──────────────────────────────────────────────────
   function init(canvasEl, teams, config) {
@@ -35,6 +35,19 @@ const Renderer = (() => {
     raceTarget = config.game.raceTarget;
 
     Animator.preload(teams);
+  }
+
+  function setTeamGifts(map) {
+    teamGiftsMap = map;
+    for (const gifts of Object.values(map)) {
+      for (const g of gifts) {
+        if (g.giftImage && !giftImages[g.giftImage]) {
+          const img = new Image();
+          img.src = g.giftImage;
+          giftImages[g.giftImage] = img;
+        }
+      }
+    }
   }
 
   // ── Geometry helpers ──────────────────────────────────────
@@ -160,20 +173,42 @@ const Renderer = (() => {
     // Logo
     Animator.drawLogo(ctx, team, logoX, logoY, logoR);
 
-    // Team name & player name
-    const nameX  = 64;
-    const maxW   = LABEL_W - nameX - 3;
+    // Three-line label: team name / gift icons / player name
+    const nameX = 64;
+    const maxW  = LABEL_W - nameX - 3;
 
     ctx.textAlign    = 'left';
     ctx.textBaseline = 'alphabetic';
 
+    // Line 1 – team name
     ctx.fillStyle = '#fff';
     ctx.font      = `bold 11.5px Segoe UI, Arial`;
-    ctx.fillText(_trunc(team.name, maxW), nameX, cy - 4);
+    ctx.fillText(_trunc(team.name, maxW), nameX, cy - 10);
 
-    ctx.fillStyle = 'rgba(255,255,255,.50)';
-    ctx.font      = `10px Segoe UI, Arial`;
-    ctx.fillText(_trunc(team.playerName || '', maxW), nameX, cy + 11);
+    // Line 2 – gift icons (Mini → Medium → Mega)
+    const gifts    = teamGiftsMap[team.id] || [];
+    const iconSize = 13;
+    const iconGap  = 3;
+    let ix = nameX;
+    for (const g of gifts) {
+      const img = g.giftImage && giftImages[g.giftImage];
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, ix, cy + 2 - iconSize, iconSize, iconSize);
+      } else {
+        ctx.font         = `${iconSize}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle    = '#fff';
+        ctx.fillText(g.giftIcon || '🎁', ix, cy + 2);
+        ctx.font         = `bold 11.5px Segoe UI, Arial`;
+      }
+      ix += iconSize + iconGap;
+    }
+
+    // Line 3 – player name
+    ctx.fillStyle    = 'rgba(255,255,255,.50)';
+    ctx.font         = `10px Segoe UI, Arial`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(_trunc(team.playerName || '', maxW), nameX, cy + 16);
   }
 
   function _trunc(text, maxW) {
@@ -392,5 +427,5 @@ const Renderer = (() => {
     ctx.restore();
   }
 
-  return { init, draw, spawnEffect, updateParticles };
+  return { init, setTeamGifts, draw, spawnEffect, updateParticles };
 })();

@@ -11,7 +11,7 @@ const path       = require('path');
 
 const cfg                          = require('./config/game-config');
 const { teams }                    = require('./config/teams');
-const { findTeamByGift, getAllGifts } = require('./config/gifts');
+const { findTeamByGift, getAllGifts, getTeamGiftsMap } = require('./config/gifts');
 
 const app    = express();
 const server = http.createServer(app);
@@ -57,6 +57,7 @@ function buildLeaderboardPayload() {
 app.get('/api/config', (_req, res) => {
   res.json({
     teams,
+    teamGifts: getTeamGiftsMap(),
     game: {
       baseSpeed:            cfg.baseSpeed,
       raceTarget:           cfg.raceTarget,
@@ -118,8 +119,9 @@ io.on('connection', (socket) => {
 
   // Dev mode: simulate gift from browser
   socket.on('simulate-gift', (data) => {
-    const tier    = data.tier || 'small';
-    const tierCfg = cfg.boostTiers[tier] || cfg.boostTiers.small;
+    const tier    = data.tier || 'Mini';
+    const tierCfg = cfg.boostTiers[tier] || cfg.boostTiers['Mini'];
+    const defaultPoints = { Mini: 1, Medium: 5, Mega: 25 };
 
     handleGiftEvent({
       uniqueId:        'DevTest',
@@ -128,7 +130,7 @@ io.on('connection', (socket) => {
       giftId:          0,
       teamId:          data.teamId,
       giftTier:        tier,
-      instantProgress: tierCfg.instantProgress,
+      instantProgress: defaultPoints[tier] || 1,
       speedMultiplier: tierCfg.speedMultiplier,
       boostDurationMs: tierCfg.boostDurationMs,
       effectType:      tierCfg.effectType,

@@ -137,11 +137,9 @@ html, body {
   white-space: nowrap;
   font-weight: 600;
 }
-.gmp-gift.small  { background: rgba(76,175,80,.35);  color: #a5d6a7; }
+.gmp-gift.mini   { background: rgba(76,175,80,.35);  color: #a5d6a7; }
 .gmp-gift.medium { background: rgba(33,150,243,.35); color: #90caf9; }
-.gmp-gift.big    { background: rgba(255,152,0,.35);  color: #ffcc80; }
 .gmp-gift.mega   { background: rgba(233,30,99,.35);  color: #f48fb1; }
-.gmp-gift.ultra  { background: rgba(156,39,176,.35); color: #ce93d8; }
 
 /* ══════════════════════════════════════════════════════════════
    BOTTOM PANEL  (1610–1920px, height 310px)
@@ -501,11 +499,9 @@ html, body {
   font-weight: 800;
   color: #fff;
 }
-.db.small  { background: #2e7d32; }
+.db.mini   { background: #2e7d32; }
 .db.medium { background: #1565c0; }
-.db.big    { background: #e65100; }
 .db.mega   { background: #880e4f; }
-.db.ultra  { background: #4a148c; }
 
 #devLegend {
   margin-top: 8px;

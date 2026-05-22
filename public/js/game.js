@@ -47,6 +47,7 @@ window.addEventListener('load', async () => {
 
   const canvas = document.getElementById('gameCanvas');
   Renderer.init(canvas, teams, serverData);
+  Renderer.setTeamGifts(serverData.teamGifts || {});
 
   FeedManager.init(teams, gameCfg);
   LeaderboardManager.init(teams);
@@ -55,7 +56,7 @@ window.addEventListener('load', async () => {
   _setupConfettiCanvas();
 
   // Gift map panel
-  await _buildGiftMapPanel(teams);
+  _buildGiftMapPanel(teams, serverData.teamGifts || {});
 
   // Dev panel
   if (isDevMode) _buildDevPanel();
@@ -232,7 +233,7 @@ function _showBoostNotif(team, data) {
   const container = document.getElementById('boostNotifs');
   const el        = document.createElement('div');
   el.className    = 'boost-notif';
-  const icons = { small:'⚡', medium:'🔥', big:'🚀', mega:'💥', ultra:'🌟' };
+  const icons = { Mini:'⚡', Medium:'🔥', Mega:'💥' };
   el.style.color  = team.accentColor || '#FFD700';
   el.textContent  = `${icons[data.giftTier] || '⚡'} ${team.name} +${data.instantProgress}`;
   container.appendChild(el);
@@ -295,27 +296,13 @@ function _drawConfetti() {
 }
 
 // ── Gift Map Panel ────────────────────────────────────────────
-async function _buildGiftMapPanel(teams) {
-  let giftMap;
-  try {
-    const res = await fetch('/api/gifts');
-    giftMap = await res.json();
-  } catch { return; }
+function _buildGiftMapPanel(teams, teamGifts) {
+  const rotateDuration = gameCfg.giftMapRotateMs || 4000;
 
-  const rotateDuration = (window._gameCfg?.giftMapRotateMs) || 4000;
-
-  // Build per-team gift lists
-  const teamGifts = {};
-  for (const [giftName, entry] of Object.entries(giftMap)) {
-    if (!teamGifts[entry.teamId]) teamGifts[entry.teamId] = [];
-    teamGifts[entry.teamId].push({ name: giftName, tier: entry.tier });
-  }
-
-  const tiers = ['small', 'medium', 'big', 'mega', 'ultra'];
-  const content  = document.getElementById('gmpContent');
-  const pager    = document.getElementById('gmpPager');
-  const pageSize = 3; // teams visible at once
-  let   page     = 0;
+  const content    = document.getElementById('gmpContent');
+  const pager      = document.getElementById('gmpPager');
+  const pageSize   = 3;
+  let   page       = 0;
   const totalPages = Math.ceil(teams.length / pageSize);
 
   function renderPage() {
@@ -342,15 +329,11 @@ async function _buildGiftMapPanel(teams) {
       const giftsWrap = document.createElement('div');
       giftsWrap.className = 'gmp-gifts';
 
-      // Sort gifts by tier order
-      const sorted = [...gifts].sort((a, b) =>
-        tiers.indexOf(a.tier) - tiers.indexOf(b.tier)
-      );
-
-      for (const g of sorted) {
+      // Already sorted Mini→Medium→Mega by server
+      for (const g of gifts) {
         const chip = document.createElement('span');
-        chip.className   = `gmp-gift ${g.tier}`;
-        chip.textContent = g.name;
+        chip.className   = `gmp-gift ${g.tier.toLowerCase()}`;
+        chip.textContent = `${g.giftIcon} ${g.giftName}`;
         giftsWrap.appendChild(chip);
       }
 
@@ -374,7 +357,7 @@ async function _buildGiftMapPanel(teams) {
 function _buildDevPanel() {
   const panel  = document.getElementById('devPanel');
   const list   = document.getElementById('devTeams');
-  const tiers  = ['small', 'medium', 'big', 'mega', 'ultra'];
+  const tiers  = ['Mini', 'Medium', 'Mega'];
   panel.classList.remove('hidden');
 
   for (const team of teams) {
